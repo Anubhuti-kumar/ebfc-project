@@ -1,0 +1,33 @@
+Question 1 -->
+Explanation of the Code:
+
+=> cnp := make(chan func(), 10): This line creates a buffered channel cnp capable of holding 10 elements, where each element is a function that takes no arguments and returns no value.
+
+=> for i := 0; i < 4; i++ { go func() { ... } }: This loop spawns 4 goroutines, each executing an anonymous function concurrently.
+
+=> for f := range cnp { f() }: Inside each goroutine, it listens for functions sent to the channel cnp, and upon receiving one, it invokes the function.
+
+=> cnp <- func() { fmt.Println("HERE1") }: This sends a function literal that prints "HERE1" to the channel cnp.
+
+
+Question 2 --> 
+Use Cases:
+
+=> This pattern is often used in concurrent programming scenarios where you need to perform asynchronous operations. For example, you can use it to process tasks concurrently, such as handling HTTP requests, processing messages from a queue, or executing multiple tasks concurrently without waiting for each one to finish.
+
+=>Buffered channels (make(chan func(), 10)) can be useful when you want to limit the number of goroutines or tasks running concurrently to avoid overwhelming system resources.
+
+Quation 3 --> 
+Significance of the For Loop with 4 Iterations:
+
+The for loop spawns 4 goroutines, each listening to the same channel cnp. This means that there will be 4 concurrent goroutines waiting to receive functions from the channel and execute them.
+
+Question 4 --> 
+Significance of make(chan func(), 10):
+
+This line initializes a buffered channel cnp with a buffer size of 10. Buffering the channel allows sending functions to the channel without blocking until there are 10 pending function calls. It can help to decouple the sending and receiving operations and improve concurrency.
+
+Question 5 --> 
+Why "HERE1" is Not Getting Printed:
+
+Since the channel cnp is buffered with a size of 10, and there are 4 goroutines concurrently listening to the channel, but only one function is sent to the channel (cnp <- func() { fmt.Println("HERE1") }), it's likely that the function is being consumed by one of the goroutines before the main goroutine has a chance to print "HERE1". The behavior of which goroutine consumes the function is non-deterministic, leading to unpredictable results. Additionally, the program terminates before all goroutines have a chance to execute the function, as there's no synchronization mechanism to wait for their completion.
